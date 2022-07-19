@@ -5,6 +5,7 @@
   },
   "dependencies": {
     "eslint": "^8.20.0",
+    "mysql2": "^2.3.3",
     "prettier": "^2.7.1"
   },
   "devDependencies": {
