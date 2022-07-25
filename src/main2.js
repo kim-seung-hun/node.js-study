@@ -28,7 +28,7 @@ const fs = require("fs");
 const mysql = require("mysql2");
 
 // body-parser는
-// 요처오가 응답사이에서 공통적인 기능을 해주는 미들웨어이다.
+// 요청과 응답사이에서 공통적인 기능을 해주는 미들웨어이다.
 // 데이터를 body라는 객체 안에 담아서 요청 응답을 받을 수 있게 해준다고 보면 된다.
 // 설치 명령어
 // ----------------------------------------------
@@ -40,12 +40,24 @@ const temp = mysql.createConnection({
   user: "root",
   password: "1234",
   database: "test5",
+  // multipleStatements : 다중 쿼리문 사용 할수 있도록하는 옵션 true , false
+  multipleStatements: true,
 });
 
 temp.query("SELECT * FROM products", (err, res) => {
   if (err) {
     const sql =
       "CREATE TABLE products(id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(20), number VARCHAR(20), series VARCHAR(20))";
+    temp.query(sql);
+  } else {
+    console.log(res);
+  }
+});
+
+temp.query("SELECT * FROM products2", (err, res) => {
+  if (err) {
+    const sql =
+      "CREATE TABLE products2(id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(20), number VARCHAR(20), series VARCHAR(20))";
     temp.query(sql);
   } else {
     console.log(res);
@@ -112,6 +124,49 @@ app.post("/insert", (req, res) => {
   //   res.send(data);
 });
 // app.get("/insert", (req, res) => {});
+
+// 삭제 button post 방식
+// app.post("/delete", (req, res) => {
+//   const sql = "delete from products where id = '" + req.body.id + "'";
+//   temp.query(sql, (err, result) => {
+//     if (err) console.log(err);
+//     else res.redirect("/");
+//   });
+// });
+
+// 삭제 button get 방식
+app.get("/delete/:id", (req, res) => {
+  // url요청에서 parameter를 뽑을 수 있는데
+  // req(요청)의 값을 이용할 수 있다.
+  // params : 매개변수
+  // http://localhost:4000/delete/1 이런 방식이면
+  // {params : {id:1}}
+  // /delete/:id 이 주소에서 id가 params 키값
+
+  // AUTO_INCREMENT도 같이 증가를 하고 값이 남아있는데
+  // 컬럼을 추가할때마다 id가 생성이 자동으로 되고 AUTO_INCREMENT도 증가를 해서
+  // update와 alter의 차이는 둘다 수정하는 명령어지만
+  // update(데이터 명령어)는 데이터 베이스 관계에 저장된 데이터를 수정하는 것,
+  // alater(데이터의 정의 명령어)는 데이터 베이스의 관계 구조를 수정하는데 사용된다.
+  const sql = "delete from products where id = ?";
+  const sql2 = "set @cnt = 0;";
+  const sql3 = "update products set products.id = @cnt:=@cnt+1;";
+  const sql4 = "alter table products auto_increment = 0;";
+  temp.query(sql, [req.params.id], (err, result) => {
+    temp.query(sql2 + sql3 + sql4, () => {
+      res.redirect("/");
+    });
+  });
+});
+
+app.get("/test", (req, res) => {
+  const sql = "select * from products;";
+  const sql2 = "select * from products2;";
+  temp.query(sql + sql2, (err, result) => {
+    console.log(res[0]);
+    console.log(res[1]);
+  });
+});
 
 app.listen(PORT, () => {
   console.log("server start");
