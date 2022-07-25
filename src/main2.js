@@ -54,15 +54,15 @@ temp.query("SELECT * FROM products", (err, res) => {
   }
 });
 
-temp.query("SELECT * FROM products2", (err, res) => {
-  if (err) {
-    const sql =
-      "CREATE TABLE products2(id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(20), number VARCHAR(20), series VARCHAR(20))";
-    temp.query(sql);
-  } else {
-    console.log(res);
-  }
-});
+// temp.query("SELECT * FROM products2", (err, res) => {
+//   if (err) {
+//     const sql =
+//       "CREATE TABLE products2(id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(20), number VARCHAR(20), series VARCHAR(20))";
+//     temp.query(sql);
+//   } else {
+//     console.log(res);
+//   }
+// });
 
 // express 함수를 실행해서 반환 값을 app에 담아줌
 const app = express();
@@ -159,14 +159,36 @@ app.get("/delete/:id", (req, res) => {
   });
 });
 
-app.get("/test", (req, res) => {
-  const sql = "select * from products;";
-  const sql2 = "select * from products2;";
-  temp.query(sql + sql2, (err, result) => {
-    console.log(res[0]);
-    console.log(res[1]);
+// 수정 button get 방식
+app.get("/edit/:id", (req, res) => {
+  fs.readFile("src/edit.html", "utf-8", (err, data) => {
+    temp.query(
+      "SELECT * FROM products WHERE id = ?",
+      [req.params.id],
+      (_err, result) => {
+        res.send(ejs.render(data, { data: result[0] }));
+      }
+    );
   });
 });
+
+app.post("/edit/:id", (req, res) => {
+  const { name, number, series } = req.body;
+  const sql =
+    "update products set name = ? , number = ? , series = ? where id = ?";
+  temp.query(sql, [name, number, series, req.params.id], () => {
+    res.redirect("/");
+  });
+});
+
+// app.get("/test", (req, res) => {
+//   const sql = "select * from products;";
+//   const sql2 = "select * from products2;";
+//   temp.query(sql + sql2, (err, result) => {
+//     console.log(res[0]);
+//     console.log(res[1]);
+//   });
+// });
 
 app.listen(PORT, () => {
   console.log("server start");
