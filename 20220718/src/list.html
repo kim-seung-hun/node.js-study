@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>list page</title>
+    <style>
+      td {
+        border: solid 1px black;
+        box-sizing: border-box;
+        text-align: center;
+      }
+      th {
+        border: solid 3px black;
+        box-sizing: border-box;
+        background-color: gray;
+      }
+    </style>
+  </head>
+  <body>
+    <table style="width: 100%">
+      <a href="/insert">추가 페이지</a>
+      <tr>
+        <th>삭제</th>
+        <th>수정</th>
+        <th>아이디</th>
+        <th>이름</th>
+        <th>전화번호</th>
+        <th>시리즈</th>
+      </tr>
+      <% data.forEach(function(el, index){ %>
+      <tr>
+        <!-- post 방식 삭제 -->
+        <!-- <form action="/delete" method="post"> -->
+        <!-- <td>
+            <button type="submit">삭제</sbutton>
+          </td> -->
+
+        <!-- get 방식 삭제 -->
+        <td><a href="/delete/<%=el.id %>">삭제</a></td>
+        <td><a href="/edit/<%=el.id %>">수정</a></td>
+        <td><%=el.id %></td>
+        <td><%=el.name %></td>
+        <td><%=el.number %></td>
+        <td><%=el.series %></td>
+        <!-- <input type="hidden" value="<%=el.id %>" name="id" /> -->
+        <!-- </form> -->
+      </tr>
+      <% }); %>
+    </table>
+  </body>
+  <script>
+    let a = [];
+    a.forEach(function (el, index) {});
+  </script>
+</html>
