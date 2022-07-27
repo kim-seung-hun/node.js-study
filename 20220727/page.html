@@ -15,7 +15,6 @@
         width: 30px;
         height: 30px;
         border-radius: 3px;
-        border: solid 1px red;
       }
       .enable {
         background-color: gray;
@@ -90,7 +89,7 @@
           // 위 바닐라JS와 아래 제이쿼리 같음
           let $line = $("<div></div>").addClass("line");
 
-          $.each(data, (indexX, seat) => {
+          $.each(line, (indexX, seat) => {
             // `
             // <div class="line">
             // <div class="seat" data-x = "indexX" data-y = indexY></div>
