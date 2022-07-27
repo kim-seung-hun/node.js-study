@@ -19,8 +19,11 @@
       .enable {
         background-color: gray;
       }
+      .enable:hover {
+        background-color: rgb(238, 231, 231);
+      }
       .disable {
-        background-color: azure;
+        background-color: rgb(43, 10, 228);
       }
     </style>
     <script src="/socket.io/socket.io.js"></script>
@@ -41,7 +44,7 @@
       // $target.classList.remove('enable') 과 같다
       $target.removeClass("enable");
       // $target.classList.add('disable') 과 같다
-      $taget.addClass("disable");
+      $target.addClass("disable");
     });
 
     // 초기 좌석 생성
@@ -99,8 +102,8 @@
               class: "seat",
               // data-x와 data-y 속성을 쓴 이유는 event를 실행했을때
               // 좌석의 위치 정보를 알기 위해서
-              "data.x": indexX,
-              "data.y": indexY,
+              "data-x": indexX,
+              "data-y": indexY,
             }).appendTo($line);
 
             // 좌석이 비어 있으면 enable 클래스와 click 이벤트 추가
