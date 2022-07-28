@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+      body {
+        position: relative;
+        height: 100vh;
+      }
+      .content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 500px;
+        height: 500px;
+        border: solid 1px;
+      }
+      #send {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        border: 1px solid;
+        box-sizing: border-box;
+        display: flex;
+      }
+      #send #msg {
+        border: 0;
+        box-sizing: border-box;
+        padding: 10px;
+        width: 90%;
+      }
+      #send #sendBtn {
+        background-color: bisque;
+        border: none;
+        box-sizing: border-box;
+        padding: 10px;
+        width: 15%;
+      }
+      #message {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+      #message li {
+        padding: 5px 10px;
+      }
+      #login {
+        width: 300px;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      #main {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="content">
+      <div>동물 카톡</div>
+      <div id="login">
+        <p>로그인</p>
+        <input type="text" id="user_name" />
+        <button id="loginBtn">접속</button>
+      </div>
+      <div id="main">
+        <select id="rooms">
+          <option value="병아리 방">병아리 방</option>
+          <option value="개구리 방">개구리 방</option>
+        </select>
+        <ul id="message"></ul>
+        <div id="send">
+          <input id="msg" />
+          <button id="sendBtn">보내기</button>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    window.onload = function () {
+      loginBtn.onclick = function () {
+        login.style.display = "none";
+        main.style.display = "block";
+        const name = user_name.value;
+        // room이 select 태그이고 options가 select 안에 있는 option등
+        // options 이건 배열
+        // rooms select 태그인데 selectedIndex 이건 현재 선택되어있는 옵션의 인덱스
+        console.log(rooms.options[0].value);
+        console.log(rooms.selectedIndex);
+        let room = rooms.options[rooms.selectedIndex].value;
+        // io.connect() 클라이언트가 접속하는 함수
+        const socket = io.connect();
+        socket.emit("joinRoom", room, name);
+
+        rooms.onchange = function (e) {
+          let el = e.target;
+          console.log(el.selectedIndex);
+          socket.emit("leaveRoom", room, name);
+          room = rooms.options[rooms.selectedIndex].value;
+          socket.emit("joinRoom", room, name);
+        };
+
+        socket.on("joinRoom", (room, name) => {
+          message.innerHTML += `
+            <li class = "join_text">
+                ${name}님 ${room}에 입장하셨습니다.
+            </li>
+            `;
+        });
+        socket.on("leaveRoom", (room, name) => {
+          message.innerHTML += `
+            <li class = "join_text">
+                ${name}님 ${room}에서 나가셨습니다.
+            </li>
+            `;
+        });
+      };
+    };
+  </script>
+</html>
