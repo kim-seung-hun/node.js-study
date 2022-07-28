@@ -43,6 +43,10 @@ io.on("connection", (socket) => {
     // to(room) 현재 그 방에 있는 클라이언트에게 요청
     io.to(room).emit("leaveRoom", room, name);
   });
+  socket.on("chat", (room, name, msg) => {
+    // to(room) 현재 그 방에 있는 클라이언트에게 요청
+    io.to(room).emit("chat", name, msg);
+  });
 });
 
 // 접속된 모든 클라이언트엑 메세지를 전송

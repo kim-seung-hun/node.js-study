@@ -60,6 +60,13 @@
         left: 50%;
         transform: translate(-50%, -50%);
       }
+      .join_text {
+        background-color: gray;
+      }
+      .leave_text {
+        background-color: deepskyblue;
+        border: 1px solid rgb(2, 133, 177);
+      }
       #main {
         display: none;
       }
@@ -119,11 +126,23 @@
         });
         socket.on("leaveRoom", (room, name) => {
           message.innerHTML += `
-            <li class = "join_text">
+            <li class = "leave_text">
                 ${name}님 ${room}에서 나가셨습니다.
             </li>
             `;
         });
+        socket.on("chat", (name, msg) => {
+          message.innerHTML += `
+            <li>
+                ${name} : ${msg}
+            </li>
+            `;
+        });
+
+        sendBtn.onclick = function () {
+          socket.emit("chat", room, name, msg.value);
+          msg.value = "";
+        };
       };
     };
   </script>
