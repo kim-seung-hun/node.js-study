@@ -28,7 +28,13 @@
         box-sizing: border-box;
         display: flex;
       }
-      #secret_name {
+      #to {
+        border: 1;
+        box-sizing: border-box;
+        width: 10%;
+        text-align: center;
+      }
+      #userselect {
         border: 1;
         box-sizing: border-box;
         width: 20%;
@@ -102,7 +108,8 @@
         </select>
         <ul id="message"></ul>
         <div id="send">
-          <input id="secret_name" />
+          <div id="to">To</div>
+          <select id="userSelect">
           <input id="msg" />
           <button id="sendBtn">보내기</button>
           <button id="secretBtn">귓말</button>
@@ -122,24 +129,21 @@
         console.log(rooms.options[0].value);
         console.log(rooms.selectedIndex);
         let room = rooms.options[rooms.selectedIndex].value;
+        let user = [];
         // io.connect() 클라이언트가 접속하는 함수
         const socket = io.connect();
 
-        socket.on("list", (socketIdList, userName) => {
-          setTimeout(() => {
-            const id = socket.id;
-            socketIdList.push(id);
-            userName.push(name);
-            console.log(socketIdList);
-            // console.log(userName);
-          }, 100);
-        });
+        setTimeout(() => {
+          let id = socket.id;
+          socket.emit("enroll", name, id);
+          console.log(id);
+        }, 100);
 
         socket.emit("joinRoom", room, name);
 
         rooms.onchange = function (e) {
-          //   let el = e.target;
-          //   console.log(el.selectedIndex);
+            // let el = e.target;
+            // console.log(el.selectedIndex);
           socket.emit("leaveRoom", room, name);
           room = rooms.options[rooms.selectedIndex].value;
           socket.emit("joinRoom", room, name);
@@ -151,10 +155,20 @@
         };
 
         secretBtn.onclick = function () {
-          socket.emit("secret", secret_name.value, name, msg.value);
+          socket.emit("secretTo", user[userSelect.selectedIndex],name,msg.value);
+          socket.emit("secretFrom", userSelect.options[userSelect.selectedIndex],name,msg.value);
           msg.value = "";
-          secret_name.value = "";
         };
+
+        socket.on("enroll", (userList, userId) => {
+          user = userId;
+          userSelect.innerHTML = "";
+          for(let i = 0; i<userId.length; i++){
+            userSelect.innerHTML += `
+            <option>${userList[i]}</option>
+            `
+          }
+        });
 
         socket.on("joinRoom", (room, name) => {
           message.innerHTML += `
@@ -177,7 +191,14 @@
             </li>
             `;
         });
-        socket.on("secret", (name, msg) => {
+        socket.on("secretChatTo", (id, msg) => {
+          message.innerHTML += `
+            <li class = "secret_text">
+                ${id} 의 귓말 : ${msg}
+            </li>
+            `;
+        });
+        socket.on("secretChatFrom", (name, msg) => {
           message.innerHTML += `
             <li class = "secret_text">
                 ${name} 의 귓말 : ${msg}
