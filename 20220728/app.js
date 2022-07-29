@@ -26,10 +26,15 @@ app.get("/", (req, res) => {
   });
 });
 
+const socketIdList = [];
+const userName = [];
+
 // 클라이언트가 접속했을때 connection
 io.on("connection", (socket) => {
-  console.log(socket);
   console.log("user 접속");
+  console.log(socket.id);
+
+  socket.emit("list", socketIdList, userName);
 
   socket.on("joinRoom", (room, name) => {
     // 방 개념으로 접속시켜주는 함수 join(방 이름)
@@ -47,9 +52,9 @@ io.on("connection", (socket) => {
     // to(room) 현재 그 방에 있는 클라이언트에게 요청
     io.to(room).emit("chat", name, msg);
   });
-  socket.on("secret", (room, name, msg) => {
-    // to(room) 현재 그 방에 있는 클라이언트에게 요청
-    io.to(room).emit("secret", name, msg);
+
+  socket.on("secret", (secret_name, name, msg) => {
+    io.to(secret_name).emit("secret", name, msg);
   });
 });
 

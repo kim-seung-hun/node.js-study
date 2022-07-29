@@ -28,17 +28,28 @@
         box-sizing: border-box;
         display: flex;
       }
-      #send #msg {
-        border: 0;
+      #secret_name {
+        border: 1;
         box-sizing: border-box;
-        padding: 10px;
-        width: 90%;
+        width: 20%;
       }
-      #send #sendBtn {
-        background-color: bisque;
-        border: none;
+      #msg {
+        border: 1;
         box-sizing: border-box;
         padding: 10px;
+        width: 50%;
+      }
+      #sendBtn {
+        background-color: bisque;
+        border: 1;
+        box-sizing: border-box;
+        padding: 10px;
+        width: 15%;
+      }
+      #secretBtn {
+        border: 1;
+        background-color: greenyellow;
+        box-sizing: border-box;
         width: 15%;
       }
       #message {
@@ -70,6 +81,9 @@
       #main {
         display: none;
       }
+      .secret_text {
+        color: greenyellow;
+      }
     </style>
   </head>
   <body>
@@ -88,8 +102,10 @@
         </select>
         <ul id="message"></ul>
         <div id="send">
+          <input id="secret_name" />
           <input id="msg" />
           <button id="sendBtn">보내기</button>
+          <button id="secretBtn">귓말</button>
         </div>
       </div>
     </div>
@@ -108,14 +124,36 @@
         let room = rooms.options[rooms.selectedIndex].value;
         // io.connect() 클라이언트가 접속하는 함수
         const socket = io.connect();
+
+        socket.on("list", (socketIdList, userName) => {
+          setTimeout(() => {
+            const id = socket.id;
+            socketIdList.push(id);
+            userName.push(name);
+            console.log(socketIdList);
+            // console.log(userName);
+          }, 100);
+        });
+
         socket.emit("joinRoom", room, name);
 
         rooms.onchange = function (e) {
-          let el = e.target;
-          console.log(el.selectedIndex);
+          //   let el = e.target;
+          //   console.log(el.selectedIndex);
           socket.emit("leaveRoom", room, name);
           room = rooms.options[rooms.selectedIndex].value;
           socket.emit("joinRoom", room, name);
+        };
+
+        sendBtn.onclick = function () {
+          socket.emit("chat", room, name, msg.value);
+          msg.value = "";
+        };
+
+        secretBtn.onclick = function () {
+          socket.emit("secret", secret_name.value, name, msg.value);
+          msg.value = "";
+          secret_name.value = "";
         };
 
         socket.on("joinRoom", (room, name) => {
@@ -139,11 +177,13 @@
             </li>
             `;
         });
-
-        sendBtn.onclick = function () {
-          socket.emit("chat", room, name, msg.value);
-          msg.value = "";
-        };
+        socket.on("secret", (name, msg) => {
+          message.innerHTML += `
+            <li class = "secret_text">
+                ${name} 의 귓말 : ${msg}
+            </li>
+            `;
+        });
       };
     };
   </script>

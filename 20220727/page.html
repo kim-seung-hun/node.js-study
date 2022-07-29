@@ -31,7 +31,13 @@
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
   </head>
   <body>
-    <div>영화관</div>
+    <div>버스 좌석 예매</div>
+    <select id="selectBtn">
+      <option value="0">1 시</option>
+      <option value="1">2 시</option>
+      <option value="2">3 시</option>
+    </select>
+    <div id="content"></div>
   </body>
   <script>
     // ajax 사용 , 제이쿼리로 작성
@@ -40,16 +46,25 @@
     const socket = io.connect();
 
     socket.on("reserve", (data) => {
-      let $target = $("div[data-x =" + data.x + "][data-y =" + data.y + "]");
-      // $target.classList.remove('enable') 과 같다
-      $target.removeClass("enable");
-      // $target.classList.add('disable') 과 같다
-      $target.addClass("disable");
+      // data에 x y selectIndex의 값도 있다
+      if (data.selectCount == selectBtn.selectedIndex) {
+        let $target = $("div[data-x =" + data.x + "][data-y =" + data.y + "]");
+        // $target.classList.remove('enable') 과 같다
+        $target.removeClass("enable");
+        // $target.classList.add('disable') 과 같다
+        $target.addClass("disable");
+      }
     });
 
+    let selectCount = 0;
     // 초기 좌석 생성
     // window.onload 와 같다
     $(window).ready(function () {
+      selectBtn.onchange = function () {
+        content.innerHTML = "";
+        selectCount = this.selectedIndex;
+        getseats(this.selectedIndex);
+      };
       // 좌석을 클릭했을때 함수
       const onClickSeat = function () {
         // $(객체) >> $() 괄호안에 있는 dom 객체를 제이쿼리 객체로 바꿔준다.
@@ -72,6 +87,7 @@
           socket.emit("reserve", {
             x,
             y,
+            selectCount,
           });
         } else {
           // no를 눌렀을 때
@@ -82,44 +98,51 @@
       // 더미 객체를 만들어서 서버에 전달하는 이유
       // 같은 url에 연속적으로 요청이 발생되면 이번에 불러왔던 데이터를 제공할 가능성이 있다.
       // 그래서 현재 시간을 기반으로 url을 매번 다른 형태로 전달.
-      $.getJSON("/seats", { dummy: new Date().getTime() }, (data) => {
-        // 좌석을 만들어보자
-        // forEach >> 제이쿼리는 each와 같다
-        $.each(data, (indexY, line) => {
-          // 문서 객체를 생성하고 변수 line에 추가
-          // let line = document.creatElement('div');
-          // line.className = "line";
-          // 위 바닐라JS와 아래 제이쿼리 같음
-          let $line = $("<div></div>").addClass("line");
+      getseats(0);
+      function getseats(selectIndex) {
+        $.getJSON(
+          "/seats/" + selectIndex,
+          { dummy: new Date().getTime() },
+          (data) => {
+            // 좌석을 만들어보자
+            // forEach >> 제이쿼리는 each와 같다
+            $.each(data, (indexY, line) => {
+              // 문서 객체를 생성하고 변수 line에 추가
+              // let line = document.creatElement('div');
+              // line.className = "line";
+              // 위 바닐라JS와 아래 제이쿼리 같음
+              let $line = $("<div></div>").addClass("line");
 
-          $.each(line, (indexX, seat) => {
-            // `
-            // <div class="line">
-            // <div class="seat" data-x = "indexX" data-y = indexY></div>
-            // </div>
-            // `
-            let $output = $("<div></div>", {
-              class: "seat",
-              // data-x와 data-y 속성을 쓴 이유는 event를 실행했을때
-              // 좌석의 위치 정보를 알기 위해서
-              "data-x": indexX,
-              "data-y": indexY,
-            }).appendTo($line);
+              $.each(line, (indexX, seat) => {
+                // `
+                // <div class="line">
+                // <div class="seat" data-x = "indexX" data-y = indexY></div>
+                // </div>
+                // `
+                let $output = $("<div></div>", {
+                  class: "seat",
+                  // data-x와 data-y 속성을 쓴 이유는 event를 실행했을때
+                  // 좌석의 위치 정보를 알기 위해서
+                  "data-x": indexX,
+                  "data-y": indexY,
+                }).appendTo($line);
 
-            // 좌석이 비어 있으면 enable 클래스와 click 이벤트 추가
-            if (seat == 1) {
-              // 비어있는 좌석
-              // on() 해당 이벤트에 연결한다고 보면됨
-              // 제이쿼리 이벤트 함수 on()
-              $output.addClass("enable").on("click", onClickSeat);
-            } else if (seat == 2) {
-              // 예약이 된 좌석
-              $output.addClass("disable");
-            }
-          });
-          $line.appendTo("body");
-        });
-      });
+                // 좌석이 비어 있으면 enable 클래스와 click 이벤트 추가
+                if (seat == 1) {
+                  // 비어있는 좌석
+                  // on() 해당 이벤트에 연결한다고 보면됨
+                  // 제이쿼리 이벤트 함수 on()
+                  $output.addClass("enable").on("click", onClickSeat);
+                } else if (seat == 2) {
+                  // 예약이 된 좌석
+                  $output.addClass("disable");
+                }
+              });
+              $line.appendTo(content);
+            });
+          }
+        );
+      }
     });
   </script>
 </html>
