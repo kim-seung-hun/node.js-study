@@ -87,7 +87,7 @@
       #main {
         display: none;
       }
-      .secret_text {
+      .secret {
         color: greenyellow;
       }
     </style>
@@ -156,7 +156,7 @@
 
         secretBtn.onclick = function () {
           socket.emit("secretTo", user[userSelect.selectedIndex],name,msg.value);
-          socket.emit("secretFrom", userSelect.options[userSelect.selectedIndex],name,msg.value);
+          socket.emit("secretFrom", userSelect.options[userSelect.selectedIndex].value,name,msg.value);
           msg.value = "";
         };
 
@@ -191,17 +191,17 @@
             </li>
             `;
         });
-        socket.on("secretChatTo", (id, msg) => {
+            socket.on("secretTo", (user, name, msg) => {
           message.innerHTML += `
-            <li class = "secret_text">
-                ${id} 의 귓말 : ${msg}
+            <li class= "secret">
+                ${name}님의 귓말 : ${msg}
             </li>
             `;
         });
-        socket.on("secretChatFrom", (name, msg) => {
+            socket.on("secretFrom", (user, name, msg) => {
           message.innerHTML += `
-            <li class = "secret_text">
-                ${name} 의 귓말 : ${msg}
+            <li class= "secret">
+                ${user}에게 귓말 : ${msg}
             </li>
             `;
         });

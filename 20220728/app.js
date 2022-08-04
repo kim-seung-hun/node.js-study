@@ -31,9 +31,6 @@ const userId = [];
 
 // 클라이언트가 접속했을때 connection
 io.on("connection", (socket) => {
-  console.log("user 접속");
-  console.log(socket.id);
-
   socket.on("enroll", (name, id) => {
     userList.push(name);
     userId.push(id);
@@ -57,11 +54,11 @@ io.on("connection", (socket) => {
     io.to(room).emit("chat", name, msg);
   });
 
-  socket.on("secretTo", (id, name, msg) => {
-    io.to(id).emit("secretChatTo", name, msg);
+  socket.on("secretTo", (user, name, msg) => {
+    io.to(user).emit("secretTo", user, name, msg);
   });
-  socket.on("secretFrom", (id, name, msg) => {
-    socket.emit("secretChatFrom", id, msg);
+  socket.on("secretFrom", (user, name, msg) => {
+    socket.emit("secretFrom", user, name, msg);
   });
 });
 
