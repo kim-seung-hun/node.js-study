@@ -49,7 +49,7 @@
           $(target).removeClass(from).addClass(to);
         }
 
-        console.log($(".products"));
+        // console.log($(".products"));
         // 개수를 변경해주는 함수
         function changeCount(index, count) {
           // class="ui-li-count" 이 속성을 가진 태그를 선택
@@ -86,7 +86,7 @@
 
               // click한 $this 요소의 부모태그 선택 parent() 함수 반환값이 부모 태그
               // remove() 해당 태그를 지워줌
-              //   $this.parent().remove();
+              $this.parent().remove();
               // 해당 태그가 listview 속성인 태그에
               // listview() 함수를 사용해서 실행할 속성은 매개변수로 전달
               $(listview).listview("refresh");

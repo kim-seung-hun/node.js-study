@@ -65,7 +65,7 @@ const products = [
 
 // console.log(products);
 
-const server = app.listen(PORT, (req, res) => {
+const server = app.listen(PORT, () => {
   console.log(PORT, "server running");
 });
 
@@ -96,7 +96,7 @@ io.on("connection", (socket) => {
   function onReturn(index) {
     // 물건에 갯수를 다시 돌린다. 더해준다
     products[index].count++;
-    // 물전을 제거
+    // 물건을 제거
     // 배열 안의 값 제거 delete 배열[인덱스]
     delete cart[index];
     let count = products[index].count;
@@ -131,7 +131,7 @@ io.on("connection", (socket) => {
   socket.on("buy", (index) => {
     // cart의 해당 삼품 index 제거
     delete cart[index];
-    let count = products[index].count;
+    let count = products.count;
     io.emit("count", {
       index,
       count,
