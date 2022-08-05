@@ -19,7 +19,7 @@
     상점 페이지
     <div class="content">
       <ul
-        id="lisetview"
+        id="listview"
         data-role="listview"
         data-inset="true"
         data-filter="true"
@@ -66,7 +66,7 @@
         // 소켓 이벤트 연결
         // 클라이언트가 알고 있는 이벤트
         socket.on("count", function (data) {
-          changeCount(data.index, data.counnt);
+          changeCount(data.index, data.count);
         });
 
         // 태그 이벤트 연결
@@ -74,9 +74,8 @@
         $(".products >a[data-icon]").click(function () {
           // 제이쿼리 객체 표현법
           let $this = $(this);
-          let index = $this.attr("data-index");
+          var index = $this.attr("data-index");
           if ($this.attr("toggle") != "off") {
-            let index = $this.attr("data-index");
             // parseInt >> 글자로 표현
             socket.emit("cart", parseInt(index));
             changeIcon(this, "ui-icon-heart", "ui-icon-check");
