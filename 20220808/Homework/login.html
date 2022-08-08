@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+      }
+      #container {
+        border: solid 1px;
+        width: 400px;
+        height: 400px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+      }
+      #login {
+        margin: 0 auto;
+        margin-top: 40px;
+        font-size: 30px;
+      }
+      #content {
+        display: flex;
+        flex-direction: column;
+      }
+      .user_log {
+        margin-left: 10px;
+        margin-top: 45px;
+      }
+      #logBtn {
+        margin: 0 auto;
+        margin-top: 30px;
+        background-color: greenyellow;
+        width: 50%;
+        height: 50px;
+        color: black;
+        font-size: 30px;
+        font-weight: 10px;
+      }
+      .user_log {
+        font-size: 15px;
+        font-weight: bold;
+      }
+      .user_log2 {
+        height: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <div id="login">로그인</div>
+      <div id="content">
+        <div class="user_log">아이디</div>
+        <input type="text" class="user_log2" id="user_id" />
+      </div>
+      <div id="content">
+        <div class="user_log">패스워드</div>
+        <input type="text" class="user_log2" />
+      </div>
+      <div id="content">
+        <button id="logBtn">접속</button>
+      </div>
+    </div>
+  </body>
+  <script>
+    logBtn.onclick = function () {
+      location.href =
+        "http://127.0.0.1:5500/node.js/20220808/Homework/page.html";
+      sessionStorage.setItem("userData", user_id.value);
+    };
+  </script>
+</html>

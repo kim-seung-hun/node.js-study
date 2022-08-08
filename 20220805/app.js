@@ -1,5 +1,5 @@
 // 경매소 만들기
-// 이후에 로그인 회원가입 분여서 구현해볼것 (쿠키 세션 JWT)
+// 이후에 로그인 회원가입 붙여서 구현해볼것 (쿠키 세션 JWT)
 
 // 사용할 모듈
 // express, ejs, socketio, fs, nomdemon
@@ -25,7 +25,7 @@ const PORT = 3000;
 // 이름도 사용하겠다는 뜻
 // express 안에 static 함수 사용
 // console.log(express.static(__dirname + "/img"));
-// 절대경로 설정
+// 절대 경로 설정
 // console.log(__dirname + "/img");
 
 //함수를 전달했고 server의 설정에 (__dirname + "/img") 파일의 경로를 설정해준다.
