@@ -67,5 +67,5 @@ let isActiveCookie = function (key) {
 // 쿠키 제거 함수
 let isDeleteCookie = function (key) {
   // 쿠키 제거 기능은 없기에 제일 예전 날짜를 넣어줘서 자동으로 삭제되게 만든다.
-  document.cookie = key + "=; expires = Thu, 01 Jan 1999 00:00:10 GMT";
+  document.cookie = key + "=; expires = Thu, 01 Jan 1999 00:00:10 GMT;path=/";
 };
