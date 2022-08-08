@@ -142,3 +142,5 @@ io.on("connection", (socket) => {
     onReturn(index);
   });
 });
+
+// study
