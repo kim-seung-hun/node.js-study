@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <label for="">Cookie name</label>
+    <input type="text" id="cookieName" />
+    <label for="">Cookie value</label>
+    <input type="text" id="cookieValue" />
+    <button id="cookieCreate">Create</button>
+
+    <label for="">Cookie view</label>
+    <input type="text" id="cookieSelect" />
+    <button id="cookieView">View</button>
+    <input type="text" readonly id="cookie" />
+  </body>
+  <script src="app.js"></script>
+  <script>
+    cookieCreate.onclick = function () {
+      createCookie(cookieName.value, cookieValue.value, 1);
+    };
+    cookieView.onclick = function () {
+      cookie.value = getCookie(cookieSelect.value);
+    };
+  </script>
+</html>
