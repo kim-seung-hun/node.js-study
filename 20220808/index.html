@@ -17,14 +17,41 @@
     <input type="text" id="cookieSelect" />
     <button id="cookieView">View</button>
     <input type="text" readonly id="cookie" />
+
+    <div id="cookieAllView"></div>
+    <button id="AllViewBtn">All cookie view</button>
+
+    <input type="text" id="activeCookie" />
+    <button id="activeBtn">Active</button>
+
+    <input type="text" id="cookieDelete" />
+    <button id="deleteBtn">Cookie delete</button>
   </body>
   <script src="app.js"></script>
   <script>
     cookieCreate.onclick = function () {
       createCookie(cookieName.value, cookieValue.value, 1);
     };
+
+    // 쿠키 전체 확인
     cookieView.onclick = function () {
       cookie.value = getCookie(cookieSelect.value);
+    };
+
+    // 쿠키 값 확인
+    AllViewBtn.onclick = function () {
+      cookieAllView.innerHTML = document.cookie;
+    };
+
+    // 쿠키 유무 확인
+    activeBtn.onclick = function () {
+      console.log(isActiveCookie(activeCookie.value));
+    };
+
+    // 쿠키 제거
+    deleteBtn.onclick = function () {
+      isDeleteCookie(cookieDelete.value);
+      console.log(cookieDelete.value, "가 삭제 되었습니다");
     };
   </script>
 </html>
