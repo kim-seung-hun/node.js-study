@@ -10,5 +10,12 @@
     "fs": "^0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "session-file-store": "^1.5.0"
-  }
+  },
+  "name": "jwt_study_02",
+  "version": "1.0.0",
+  "main": "app.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }

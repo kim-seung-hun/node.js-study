@@ -66,7 +66,7 @@ app.post("/login", (req, res) => {
   // ---------------------------------
   // npm i dotenv
   // ---------------------------------
-  const name = "jinny";
+  const name = "huni";
   const key = process.env.KEY;
   // jwt 토큰 생성하는 함수 (반환 값 있음)
   let token = jwt.sign(
@@ -100,5 +100,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(3000, () => {
-  console.log("서버열림");
+  console.log("server running");
 });
