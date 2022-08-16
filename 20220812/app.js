@@ -101,7 +101,9 @@ app.post("/login", (req, res) => {
 
     // 쿠키의 이름은 "refresh" , 유효기간은 maxAge = 하루
     res.cookie("refresh", refresToken, { maxAge: 24 * 60 * 60 * 1000 });
-    return res.send(accessToken);
+    fs.readFile('view/join.html','utf-8',(err,data)=>{
+      res.send(data);
+    })
   } else {
     return res.send("아이디/비밀번호 오류");
   }
@@ -111,10 +113,35 @@ app.post("/refresh", (req, res) => {
   // ? 뒤에 refresh 유무 확인 후 불러온다.
   if (req.cookies?.refresh) {
     const refreshtoken = req.cookies.refresh;
+    // refresh token이 정상인지 확인
+    jwt.verify(refreshtoken,key2,(err,decoded)=>{
+      // err이 있으면 refresh token이 썩었기 때문에 다시 로그인 시킨다.
+      if(err){
+        res.send('로그인을 다시 해주세요')
+      } else{
+        // err없고 정상적인 토큰이면 다시 access token 발급
+        // jwt에 sign 함수로 토큰 다시 생성
+        const accessToken = jwt.sign({
+          id: user.id,
+        },key1,{
+          expiresIn: "10m"
+        })
+      }
+    })
+    res.send(accessToken)
   } else {
+    res.send('다시 로그인 해주세요');
   }
 });
 
 app.listen(3000, () => {
   console.log(3000, "server running");
 });
+
+
+
+// access token을 왜 짧게 하고 새로 로그인 정보를 갱신 해줄까?
+// 해커가 악의적으로 access token을 얻었을때 로그인이 이미 되어있는 상태라 막기가 힘들어서
+// access token의 유효기간을 짧게하고 refresh token의 유효기간을 길게해서 사용자가 로그인을 자주하는 불편함을 보완해준다.
+// 그리고 악의적으로 탈취된 access token을 갱신해주는 역할도 해준다.
+// refresh token을 다시 확인 시켜서, 좀 더 해킹이 힘들게 해준다.
