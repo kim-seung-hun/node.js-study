@@ -136,8 +136,12 @@ const pwHashed = (userId, password) => {
         const salt = await result[0].salt;
         // pbkdf2 암호화를 하는데 해싱 알고리즘은 sha512
         // 길이 : 64 , 반복횟수 : 12345
-        crypto.pbkdf2(password, salt, 12345, 64, "sha512", (err, key) => {
-          resolve(key.toString("base64"));
+        crypto.pbkdf2(password, salt, 10000, 64, "sha512", (err, key) => {
+          if (key.toString("base64") === result[0].password) {
+            resolve(key.toString("base64"));
+          } else {
+            reject("err");
+          }
         });
       } else {
         reject("err");
@@ -203,6 +207,17 @@ app.post("/join", async (req, res) => {
   client.query(sql, [req.body.user_id, password, salt], () => {
     res.redirect("/login");
   });
+});
+
+app.post("/login", (req, res) => {
+  const { user_id, user_pw } = req.body;
+  pwHashed(user_id, user_pw)
+    .then((result) => {
+      res.send(result + "로그인 됐어요");
+    })
+    .catch((err) => {
+      res.send(err);
+    });
 });
 
 app.listen(3000, () => {
