@@ -7,6 +7,19 @@ const jwt = require("jsonwebtoken");
 const session = require("express-session");
 const mysql = require("mysql2");
 const fs = require("fs");
+const bcrypt = require("bcrypt");
+
+// 처음부터 단방향으로 암호화 시켜주는 해시함수
+// bcrypt는 값이 4등분 나눠진다.
+// Algorithm : 알고리즘이 뭔지 "$2a"는 bcrypt라는 것이다.
+// cost factor : 키 스트레칭한 횟수. 2^n으로 반복시킨다. 10 1024번
+// salt : 128비트의 솔트 22자 base64로 인코딩
+// hash : 솔트 기법과 키 스트레칭을 한 해시값
+
+// const pw = "12445";
+// bcrypt.hash(pw, 10, (err, data) => {
+//   console.log(data);
+// });
 
 // mysql 로컬 데이터베이스 연결
 // mysql createConnection 함수를 이용해서 연결 및 생성
@@ -52,7 +65,8 @@ app.get("/join", (req, res) => {
 
 // // id는 INT AUTO_INCREAMENT PRIMARY KEY 컬럼 값을 추가하지 않아도 자동으로 증가하는 숫자
 // // user_id 이름으로 컬럼을 만들고 VARCHAR(255) 문자 255자 까지 허용
-// const sql = 'create table users (id INT AUTO_INCREMENT PRIMARY KEY, user_id VARCHAR(255), password VARCHAR(255), refresh VARCHAR(255))';
+// const sql =
+//   "create table users (id INT AUTO_INCREMENT PRIMARY KEY, user_id VARCHAR(255), password VARCHAR(255), refresh VARCHAR(255))";
 
 // // client 객체 안의 query 함수로 쿼리문 실행
 // client.query(sql);
@@ -66,17 +80,22 @@ app.post("/join", (req, res) => {
   // 쿼리문 INSERT INTO users = users 테이블에 추가한다
   // 값을 넣어서 추가하는 컬럼은 (user_id,password) 두개
   // VALUE(?,?) 값의 밸유는 옵션으로 전달한다
-  const sql = "INSERT INTO users (user_id,password)VALUE(?,?)";
-  // VALUE(?,?) 순서대로 [userId,password] 값 전달
-  client.query(sql, [userId, password], () => {
-    // redirect 함수로 매개변수 url 해당 경로로 페이지를 이동시켜준다
-    res.redirect("/");
+  bcrypt.hash(password, 10, (err, data) => {
+    const sql = "INSERT INTO users (user_id,password)VALUE(?,?)";
+    // VALUE(?,?) 순서대로 [userId,password] 값 전달
+    client.query(sql, [userId, data], () => {
+      // redirect 함수로 매개변수 url 해당 경로로 페이지를 이동시켜준다
+      res.redirect("/");
+    });
   });
 });
 
 app.post("/login", (req, res) => {
   const { userId, password } = req.body;
   // user table을 찾고 WHERE user_id=? 로 검색
+  bcrypt.hash(password, 10, (err, data) => {
+    console.log(data);
+  });
   const sql = "SELECT * FROM users WHERE user_id=?";
   client.query(sql, [userId], (err, result) => {
     if (err) {
@@ -84,40 +103,46 @@ app.post("/login", (req, res) => {
     } else {
       // result[0]에 값이 있으면 계정이 존재한다는 뜻, 아니면 계정이 없다
       // ?. 구문 뒤에 키값이 잇는지 먼저 보고 값을 참조한다, 그래서 없으면 터지는 일(crash) 방지
-      if (result[0] && password === result[0]?.password) {
-        // 로그인 성공하여 토큰 발급
-        const accessToken = jwt.sign(
-          {
-            // payload 전달할 값
-            userId: result[0].user_id,
-            mail: "seunghun@naver.com",
-            name: "huni",
-          },
-          process.env.ACCESS_TOKEN,
-          {
-            expiresIn: "5s",
-          }
-        );
+      if (result[0]) {
+        bcrypt.compare(password, result[0]?.password, (err, same) => {
+          if (same) {
+            // 로그인 성공하여 토큰 발급
+            const accessToken = jwt.sign(
+              {
+                // payload 전달할 값
+                userId: result[0].user_id,
+                mail: "seunghun@naver.com",
+                name: "huni",
+              },
+              process.env.ACCESS_TOKEN,
+              {
+                expiresIn: "5s",
+              }
+            );
 
-        const refreshToken = jwt.sign(
-          {
-            userId: result[0].user_id,
-          },
-          process.env.REFRESH_TOKEN,
-          {
-            expiresIn: "1m",
-          }
-        );
+            const refreshToken = jwt.sign(
+              {
+                userId: result[0].user_id,
+              },
+              process.env.REFRESH_TOKEN,
+              {
+                expiresIn: "1m",
+              }
+            );
 
-        // table의 user_id를 검색하여 , refresh 값 수정
-        const sql = "UPDATE users SET refresh=? WHERE user_id=?";
-        // [수정할 값 , 찾는 값]
-        client.query(sql, [refreshToken, userId]);
-        // 세션에 accessToken 값을 access_token키 값으로 할당
-        req.session.access_token = accessToken;
-        // 세션에 refreshToken 값을 refresh_token 값으로 할당
-        req.session.refresh_token = refreshToken;
-        res.send({ access: accessToken, refresh: refreshToken });
+            // table의 user_id를 검색하여 , refresh 값 수정
+            const sql = "UPDATE users SET refresh=? WHERE user_id=?";
+            // [수정할 값 , 찾는 값]
+            client.query(sql, [refreshToken, userId]);
+            // 세션에 accessToken 값을 access_token키 값으로 할당
+            req.session.access_token = accessToken;
+            // 세션에 refreshToken 값을 refresh_token 값으로 할당
+            req.session.refresh_token = refreshToken;
+            res.send({ access: accessToken, refresh: refreshToken });
+          } else {
+            res.send("비밀번호 틀림");
+          }
+        });
       } else {
         res.send("계정없음");
       }
