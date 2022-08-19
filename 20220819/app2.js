@@ -3,7 +3,7 @@ const fs = require("fs");
 // path는 기본 경로를 다룰수 있게 도와주는 모듈
 const path = require("path");
 const ejs = require("ejs");
-const { sequelize } = require("./model");
+const { sequelize, User, Post } = require("./model");
 
 const app = express();
 
@@ -40,6 +40,55 @@ sequelize
   .catch((err) => {
     console.log(err);
   });
+
+app.get("/", (req, res) => {
+  res.render("create");
+});
+
+app.post("/create", (req, res) => {
+  // create 함수를 사용하면 해당 테이블에 컬럼을 추가할수 있다.
+  const { name, age, msg } = req.body;
+  const create = User.create({
+    name: name,
+    age: age,
+    msg: msg,
+  });
+});
+
+app.get("/user", (req, res) => {
+  // 여기는 추가된 유저들을 봐야하니까
+  // 조회를 하는데 전체를 조회해야한다.
+  // findAll()
+  // 매개변수로 검색할 옵션을 받는다.
+  // where , order 등등
+  // 조건이 없으면 전부다 가져온다.
+  User.findAll({})
+    .then((e) => {
+      res.render("page", { data: e });
+    })
+    .catch((err) => {
+      // 실패시 에러페이지 보여준다.
+      res.render("err");
+    });
+});
+
+app.post("/create_post", (req, res) => {
+  const { name, text } = req.body;
+  console.log(name, text);
+  // User 테이블과 Post 랑 연결되었는데
+  // User id 기본키로 되어있고 Post 는 user_id
+  // 테이블에서 하나의 컬럼값 가져온다.
+  // 하나를 검색할때 사용
+  User.findOne({
+    where: { name: name },
+  }).then((e) => {
+    Post.create({
+      msg: text,
+      // foreignKey = user_id 이고 유저의 id와 모델에 연결한다고 정의 (users.js 와 posts.js)
+      user_id: e.id,
+    });
+  });
+});
 
 app.listen(3000, () => {
   console.log(3000, "server running");

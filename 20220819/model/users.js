@@ -1,4 +1,3 @@
-const { NOW } = require("sequelize");
 const Sequelize = require("sequelize");
 
 // User 클래스에서 시퀄라이즈 안에 모듈 객체의 기능을 상속 시켜주기위해서
@@ -47,10 +46,35 @@ class User extends Sequelize.Model {
         // },
       },
       {
+        // 위에 매개변수 쓴걸 연결시켜주는 옵션
         sequelize,
         // update 시간과 create 시간도 자동으로 두개 생김
         timestamps: true,
+        // 스네이크 표기법으로 바꿔주는 옵션 userData >> user_data (true 시)
+        // create_at >> createAt (false 시)
+        underscored: false,
+        // 모델의 이름을 설정할수 있다.
+        // 관계형으로 구성할때 사용
+        modelName: "User",
+        // database에 테이블의 이름을 설정할수 있다.
+        tableName: "users",
+        // paranoid true 로 설정하면 deletedAt 생성 (삭제 시간 추가 , 컬럼 값은 남아있다.)
+        paranoid: false,
+        // charset , collate : 아래와 같이 설정 시 한글 입력가능
+        // 이모티콘 사용할 경우 : utf8mb4 , utf8mb4-general_ci
+        charset: "utf8",
+        collate: "utf8_general_ci",
       }
     );
   }
+  // 1:N (foreignkey) 외래키
+  static associate(db) {
+    // 1:N 관계 (hasMany , belongTo)
+    // 시퀄라이즈에서 1:N 관계를 hasMany 함수로 테이블의 관계를 정의를 한다.
+    // 첫번째 매개변수 : 연결할 테이블 , 두번째 매개변수 : sourceKey User 테이블안에 무슨키를 foreignKey와 연결할지
+    // hasMAny() 첫번째로 넘겨준 테이블이 foreignKey 연결되고 foreignKey 이름은 user_id 이다.
+    db.User.hasMany(db.Post, { foreignKey: "user_id", sourceKey: "id" });
+  }
 }
+
+module.exports = User;
