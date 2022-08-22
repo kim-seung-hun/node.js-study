@@ -16,7 +16,7 @@
         <span class="name"><%= user.name %></span>님 <%= user.age %>살 코멘트
         <%= user.msg %> <input type="text" class="text" />
         <button class="itemBtn">글 등록</button>
-        <a href="">등록글 보러가기</a>
+        <a class="viewBtn" href="/view<%= user.name %>">등록글 보러가기</a>
       </li>
       <% }) %>
     </ul>

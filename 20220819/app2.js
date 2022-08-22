@@ -74,7 +74,6 @@ app.get("/user", (req, res) => {
 
 app.post("/create_post", (req, res) => {
   const { name, text } = req.body;
-  console.log(name, text);
   // User 테이블과 Post 랑 연결되었는데
   // User id 기본키로 되어있고 Post 는 user_id
   // 테이블에서 하나의 컬럼값 가져온다.
@@ -87,6 +86,55 @@ app.post("/create_post", (req, res) => {
       // foreignKey = user_id 이고 유저의 id와 모델에 연결한다고 정의 (users.js 와 posts.js)
       user_id: e.id,
     });
+  });
+});
+
+// params 값으로 받음
+app.get("/view/:name", (req, res) => {
+  // 해당 유저를 이름으로 조회하고
+  User.findOne({
+    where: {
+      // 조건문 누구 찾을건지
+      // params로 name 키값에 있는 value로 이름 검색
+      name: req.params.name,
+    },
+    // 리턴값을 단일 객체로 변형해서 보여준다.
+    // raw: true,
+    // 관계형 모델 불러오기
+    // 관계를 맺어놀은 모델을 조회할수있다.
+    // 여기선 해당 검색된 유저와 맞는 user 모델의 id가 1번이면 Post 모델의 user_id 키가 같은 애들을 조회
+    include: [
+      {
+        // Post 모델이 조회 되었으면 하니까 Post 모델 써줌
+        medel: Post,
+      },
+    ],
+  }).then((e) => {
+    e.dataValues.Post = e.dataValues.Posts.map((i) => i.dataValues);
+    const Posts = e.dataValues;
+    console.log(Posts);
+    res.render("view", { data: Posts });
+  });
+});
+
+app.post("/view_Updata", (req, res) => {
+  const { id, msg, text } = req.body;
+  // 수정 쿼리문
+  // 객체가 들어가는데
+  // 첫번째 매개변수 : 수정할 내용
+  // 두번째 매개변수 : 검색조건
+  Post.update({ msg: msg }, { where: { id: id, msg: text } });
+});
+
+app.get("/delete/:id", (req, res) => {
+  // 삭제 쿼리문
+  // 매개변수 객체 내용은 검색 조건
+  Post.destroy({
+    // 검색은 params의 안에 있는 id 키값
+    where: { id: req.params.id },
+  }).then(() => {
+    // 잘 끝나면 유저 페이지로 이동
+    res.redirect("/user");
   });
 });
 
