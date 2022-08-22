@@ -22,6 +22,7 @@ Post.init(sequelize);
 
 // 관계형 맺어주는 함수 사용
 User.associate(db);
+// 관계형 맺어주는 함수 사용
 Post.associate(db);
 
 module.exports = db;

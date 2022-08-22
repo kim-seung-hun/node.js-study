@@ -53,6 +53,7 @@ app.post("/create", (req, res) => {
     age: age,
     msg: msg,
   });
+  res.render("/create");
 });
 
 app.get("/user", (req, res) => {
@@ -62,14 +63,9 @@ app.get("/user", (req, res) => {
   // 매개변수로 검색할 옵션을 받는다.
   // where , order 등등
   // 조건이 없으면 전부다 가져온다.
-  User.findAll({})
-    .then((e) => {
-      res.render("page", { data: e });
-    })
-    .catch((err) => {
-      // 실패시 에러페이지 보여준다.
-      res.render("err");
-    });
+  User.findAll({}).then((e) => {
+    res.render("page", { data: e });
+  });
 });
 
 app.post("/create_post", (req, res) => {
@@ -106,13 +102,14 @@ app.get("/view/:name", (req, res) => {
     include: [
       {
         // Post 모델이 조회 되었으면 하니까 Post 모델 써줌
-        medel: Post,
+        model: Post,
       },
     ],
   }).then((e) => {
-    e.dataValues.Post = e.dataValues.Posts.map((i) => i.dataValues);
+    e.dataValues.Posts = e.dataValues.Posts.map((i) => i.dataValues);
     const Posts = e.dataValues;
     console.log(Posts);
+    //console.log(e.dataValues);
     res.render("view", { data: Posts });
   });
 });
@@ -123,6 +120,7 @@ app.post("/view_Updata", (req, res) => {
   // 객체가 들어가는데
   // 첫번째 매개변수 : 수정할 내용
   // 두번째 매개변수 : 검색조건
+  // 검색조건은 id와 msg 둘다 검색해서 맞는애 탐색
   Post.update({ msg: msg }, { where: { id: id, msg: text } });
 });
 
