@@ -92,3 +92,17 @@
 // git remote add origin 깃저장소
 // git pull origin main
 // 우분투에 내 파일이 올라간다.
+
+// node.js 설치
+
+// sudo apt-get update
+// sudo apt-get install -y build-essential
+// sudo apt-get install curl
+// curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash --
+// sudo apt-get install -y nodejs
+
+// node 버전 확인
+// node -v
+
+// npm 버전 확인
+// npm -v
